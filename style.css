@@ -1,0 +1,23 @@
+canvas {
+	border: 1px solid black;
+	display: block;
+	float: left;
+}
+
+button {
+	display: block;
+	float: left;
+	width: 200px;
+	height: 40px;
+	background: #ffffff;
+	border: 1px solid black;
+}
+
+button:hover {
+	cursor: pointer;
+    background: #e2e1e1;
+}
+
+button:focus {
+    outline: none;
+}
