@@ -4,6 +4,23 @@ window.addEventListener('resize', () => {
 })
 
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
 window.addEventListener('load', () => {
 
 	// Variables
@@ -52,18 +69,37 @@ window.addEventListener('load', () => {
 			data.push(imdata[i])
 		}
 
-		console.log(data)
-		console.log(data.length)	
 		
 		// send data to server
-		data = JSON.stringify(data);
+		const csrftoken = getCookie('csrftoken');
+		data = JSON.stringify(data)
+
+		let xhr = new XMLHttpRequest();
+
+		xhr.open('POST', 'http://localhost:8000/canvas', true);
+
+		xhr.responseType = 'json';
+		xhr.setRequestHeader('X-CSRFToken', csrftoken);
+		xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+		xhr.onreadystatechange = function(){
+			if(xhr.readyState === 4 && xhr.status === 200){
+				response = xhr.response;
+				console.log(response);
+
+			};
+		};
+
+		console.log(typeof(data));
+		console.log(data.length);
+		xhr.send('data=' + data);
 
 	};
 
 	// Event listeners
 
-	canvas.addEventListener('mousedown', startPosition);
 	document.addEventListener('mouseup', finishPosition);
+	canvas.addEventListener('mousedown', startPosition);
 	canvas.addEventListener('mousemove', draw);
 	button.addEventListener('click', getData);
 });
