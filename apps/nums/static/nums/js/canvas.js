@@ -25,12 +25,17 @@ window.addEventListener('load', () => {
 
 	// Variables
 
+	// vars for canvas
 	const canvas = document.querySelector('#canvas');
 	const ctx = canvas.getContext('2d');
+	
+	// button for function getData
 	const button = document.querySelector('#predict');
 	
 	// canvas.style.marginLeft = '60px';
 	// canvas.style.marginRight = '60px';
+
+	// to pass the validation test number of pixels must be divisible by 784 and canvas must be square
 	canvas.height = Math.floor(window.innerHeight / 28) * 28;
 	canvas.width = canvas.height;
 
@@ -38,16 +43,19 @@ window.addEventListener('load', () => {
 
 	// Functions
 
+	// start drawing
 	function startPosition(e){
 		painting = true;
 		draw(e);
 	};
 
+	// end drawing
 	function finishPosition(){
 		painting = false;
 		ctx.beginPath();
 	};
 
+	// draw little stroke
 	function draw(e){
 		if(!painting) return;
 		ctx.lineWidth = 20;
@@ -59,6 +67,7 @@ window.addEventListener('load', () => {
 		ctx.moveTo(e.clientX, e.clientY)
 	};
 
+	// sends data to server and gets response data
 	function getData() {
 		let ImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 		let imdata = ImageData.data;
@@ -90,7 +99,6 @@ window.addEventListener('load', () => {
 			};
 		};
 
-		console.log(typeof(data));
 		console.log(data.length);
 		xhr.send('data=' + data);
 
@@ -98,8 +106,12 @@ window.addEventListener('load', () => {
 
 	// Event listeners
 
+	// finish drawing
 	document.addEventListener('mouseup', finishPosition);
+	// start drawing
 	canvas.addEventListener('mousedown', startPosition);
+	// draw when cursor moves
 	canvas.addEventListener('mousemove', draw);
+	// send data and get enother data
 	button.addEventListener('click', getData);
 });
