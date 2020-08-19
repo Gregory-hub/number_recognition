@@ -14,8 +14,7 @@ class IndexView(TemplateView):
 def canvas(request):
 	"""Ajax view
 	Takes array of length which can be divided by 784 and returns number
-	"""
-
+	""" 
 	data = request.POST.get('data', default=None)
 
 	number = None
@@ -24,7 +23,6 @@ def canvas(request):
 		if (len(data) % 784) == 0:
 			number = get_number(data)
 
-	# print(number)
-	
-	
-	return JsonResponse({'number': number})
+	print(number)
+
+	return JsonResponse({'number': str(number)})
