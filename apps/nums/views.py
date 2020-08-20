@@ -18,11 +18,12 @@ def canvas(request):
 	data = request.POST.get('data', default=None)
 
 	number = None
+	probabilities = None
 	if data != None:
 		data = data.replace('[', '').replace(']', '').split(',')
 		if (len(data) % 784) == 0:
-			number = get_number(data)
+			number, probabilities = get_number(data)
 
 	print(number)
 
-	return JsonResponse({'number': str(number)})
+	return JsonResponse({'number': str(number), 'probabilities': str(probabilities)})

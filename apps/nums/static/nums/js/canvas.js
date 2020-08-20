@@ -1,9 +1,3 @@
-window.addEventListener('resize', () => {
-	canvas.height = Math.floor(window.innerHeight / 28) * 28;
-	canvas.width = canvas.height;
-})
-
-
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -36,7 +30,7 @@ window.addEventListener('load', () => {
 	// canvas.style.marginRight = '60px';
 
 	// to pass the validation test number of pixels must be divisible by 784 and canvas must be square
-	canvas.height = Math.floor(window.innerHeight / 28) * 28;
+	canvas.height = 784;
 	canvas.width = canvas.height;
 
 	let painting = false;
@@ -58,7 +52,7 @@ window.addEventListener('load', () => {
 	// draw little stroke
 	function draw(e){
 		if(!painting) return;
-		ctx.lineWidth = 20;
+		ctx.lineWidth = 40;
 		ctx.lineCap = 'round';
 
 		ctx.lineTo(e.clientX, e.clientY);
@@ -94,12 +88,13 @@ window.addEventListener('load', () => {
 		xhr.onreadystatechange = function(){
 			if(xhr.readyState === 4 && xhr.status === 200){
 				response = xhr.response;
-				console.log(response);
-
+				console.log(response['number']);
+				console.log(response['probabilities']);
+				result = document.querySelector(".result");
+				result.innerHTML = response['number']
 			};
 		};
 
-		console.log(data.length);
 		xhr.send('data=' + data);
 
 	};
