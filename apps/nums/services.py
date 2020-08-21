@@ -1,24 +1,32 @@
 import os
 import logging
+import traceback
 import numpy as np
 from tensorflow import keras
 
+from .base import base_service_view
 
+
+@base_service_view
 def get_number(data):
 	"""Takes array of values between 0 and 255 of length which can be divided by 784, 
 	reshapes it to 28x28 and predicts number using neural network
 	If something wrong, returns None"""
+
 	if not isinstance(data, list):
 		return None
-	data = prepare(data)
+	
+	data = prepare(data)	
 	return predict(data)
 	
 
+@base_service_view
 def prepare(data):
 	"""Reshapes data to 1x28x28 and makes all values floats between 0 and 1
 	If something wrong, returns None"""
 	if (len(data) % 784) != 0:
-		return None
+		return None	
+
 	try:
 		data = np.array(data, dtype='float16')
 		if np.isnan(data).any():
@@ -27,15 +35,15 @@ def prepare(data):
 
 		data = data.reshape((int(len(data)**(1/2))), (int(len(data)**(1/2))))
 	except ValueError as err:
-		print('Error in prepare:', err)
+		print('Error in {0}: {1}'.format(fn.__name__, traceback.format_exc()))
 		return None
 	
-	if len(data) > 28:
-		data = reduce_shape(data)
+	data = reduce_shape(data)
 
 	return data
 
 
+@base_service_view
 def reduce_shape(data):
 	"""Reshapes data to 1x28x28
 	If something wrong, returns None"""
@@ -52,15 +60,18 @@ def reduce_shape(data):
 	try:
 		data28 = data28.reshape((1, 28, 28))
 	except ValueError as err:
-		print('Error in reduce_shape:', err)
+		print('Error in {0}: {1}'.format(fn.__name__, traceback.format_exc()))
 		return None
 	
 	return data28
 
 
+@base_service_view
 def predict(data):
 	"""Predicts a number from 1x28x28 dataset of float 0-1 values
 	If something wrong, returns None"""
+	if not isinstance(data, np.ndarray):
+		return None
 	if (not os.path.isfile('apps/nums/nn_model/saved_model.pb')) or (not os.path.isdir('apps/nums/nn_model/variables')):
 		train_and_save()
 	if not os.path.isdir('apps/nums/nn_model'):
@@ -69,11 +80,12 @@ def predict(data):
 	try:
 		result = model.predict(data)
 	except ValueError as err:
-		print('Error in predict:', err)
+		print('Error in {0}: {1}'.format(fn.__name__, traceback.format_exc()))
 		return None
 	return np.argmax(result), result
 
 
+@base_service_view
 def train_and_save():
 	"""Creates model and saves it to apps/nums/nn_model directory"""
 	if os.path.isdir('apps/nums/nn_model'):
