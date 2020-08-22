@@ -122,7 +122,8 @@ class TestPredict(TestCase):
 class TestTrainAndSave(TestCase):
 
 	def tearDown(self):
-		shutil.rmtree('apps/nums/nn_model')
+		if os.path.isdir('apps/nums/nn_model'):
+			shutil.rmtree('apps/nums/nn_model')
 
 	def test_if_dir_doesnt_exist(self):
 		if os.path.isdir('apps/nums/nn_model'):

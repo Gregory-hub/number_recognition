@@ -1,30 +1,36 @@
 import os
+import sys
 import logging
 import traceback
 import numpy as np
 from tensorflow import keras
 
-from .base import base_service_view
+
+from .base import base_service
 
 
-@base_service_view
+logger = logging.getLogger(__name__)
+
+
+@base_service
 def get_number(data):
 	"""Takes array of values between 0 and 255 of length which can be divided by 784, 
 	reshapes it to 28x28 and predicts number using neural network
 	If something wrong, returns None"""
-
 	if not isinstance(data, list):
+		logger.warning('data is not list!')
 		return None
 	
 	data = prepare(data)	
 	return predict(data)
 	
 
-@base_service_view
+@base_service
 def prepare(data):
 	"""Reshapes data to 1x28x28 and makes all values floats between 0 and 1
 	If something wrong, returns None"""
 	if (len(data) % 784) != 0:
+		logger.warning('len(data) is not divisible by 784!')
 		return None	
 
 	try:
@@ -35,7 +41,7 @@ def prepare(data):
 
 		data = data.reshape((int(len(data)**(1/2))), (int(len(data)**(1/2))))
 	except ValueError as err:
-		print('Error in {0}: {1}'.format(fn.__name__, traceback.format_exc()))
+		logging.error(traceback.format_exc())
 		return None
 	
 	data = reduce_shape(data)
@@ -43,11 +49,12 @@ def prepare(data):
 	return data
 
 
-@base_service_view
+@base_service
 def reduce_shape(data):
 	"""Reshapes data to 1x28x28
 	If something wrong, returns None"""
 	if (len(data) % 784) != 0:
+		logger.warning('len(data) is not divisible by 784!')
 		return None
 
 	data28 = np.array([], dtype='float16')
@@ -60,32 +67,36 @@ def reduce_shape(data):
 	try:
 		data28 = data28.reshape((1, 28, 28))
 	except ValueError as err:
-		print('Error in {0}: {1}'.format(fn.__name__, traceback.format_exc()))
+		logging.error(traceback.format_exc())
 		return None
 	
 	return data28
 
 
-@base_service_view
+@base_service
 def predict(data):
 	"""Predicts a number from 1x28x28 dataset of float 0-1 values
 	If something wrong, returns None"""
 	if not isinstance(data, np.ndarray):
+		logger.warning('data is not np.ndarray!')
 		return None
+
 	if (not os.path.isfile('apps/nums/nn_model/saved_model.pb')) or (not os.path.isdir('apps/nums/nn_model/variables')):
 		train_and_save()
 	if not os.path.isdir('apps/nums/nn_model'):
+		logger.warning('dir(apps/nums/nn_model) has not been made by train_and_save!')
 		return None
+
 	model = keras.models.load_model('apps/nums/nn_model')
 	try:
 		result = model.predict(data)
 	except ValueError as err:
-		print('Error in {0}: {1}'.format(fn.__name__, traceback.format_exc()))
+		logging.error(traceback.format_exc())
 		return None
 	return np.argmax(result), result
 
 
-@base_service_view
+@base_service
 def train_and_save():
 	"""Creates model and saves it to apps/nums/nn_model directory"""
 	if os.path.isdir('apps/nums/nn_model'):

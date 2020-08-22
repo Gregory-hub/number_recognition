@@ -123,3 +123,45 @@ STATIC_URL = '/static/'
 
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 100000000
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module}.{funcName} "{message}"',
+            'style': '{',
+        }
+    },
+
+    'handlers': {
+        'services': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': 'nums.log',
+            'formatter': 'verbose',
+        },
+    },
+
+    'loggers': {
+        'apps.nums.services': {
+            'handlers': ['services'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+
+        'apps.nums.views': {
+            'handlers': ['services'],
+            'level': 'WARNING',
+            'propagate': True,
+        },
+
+        'apps.nums.base': {
+            'handlers': ['services'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
